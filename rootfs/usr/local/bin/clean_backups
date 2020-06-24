@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+echo "======= BACKUP RETENTION CLEAN-UP BEGIN ======="
+
+# Set up timezone
+if [ -z "${BACKUP_RETENTION}" ]; then
+  echo "WARNING: BACKUP_RETENTION environment variable not set!"
+else
+
+  echo "Removing backups older than ${BACKUP_RETENTION} hours..."
+
+  find /opt/minecraft/worlds_backup \
+    -type f \
+    -cmin +$(expr $BACKUP_RETENTION \* 60) \
+    -exec rm -v {} \; | stdbuf -o0 awk '{print "  - " $0}'
+
+  find /opt/minecraft/worlds_backup \
+    -type d \
+    -empty \
+    -delete
+
+fi
+
+echo "======= BACKUP RETENTION CLEAN-UP FINISH ======="
+echo ""

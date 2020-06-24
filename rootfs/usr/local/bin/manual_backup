@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+flock --exclusive --nonblock /tmp/backup.lock /usr/local/bin/run_backup

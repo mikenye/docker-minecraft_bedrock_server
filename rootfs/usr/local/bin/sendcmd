@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+tmux send-keys -t bedrock_server:0.0 "$*" Enter

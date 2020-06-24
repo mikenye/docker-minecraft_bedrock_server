@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+#set -x
+
+# Change to minecraft dir
+cd /opt/minecraft
+
+LD_LIBRARY_PATH=. s6-setuidgid minecraft ./bedrock_server
+
+# Save exit code
+echo -n $? > /opt/minecraft/.exitcode
+
+# Print exit code
+echo "bedrock_server exit code: $(cat /opt/minecraft/.exitcode)"
