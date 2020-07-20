@@ -253,6 +253,4 @@ Please feel free to [open an issue on the project's GitHub](https://github.com/m
 
 ## Changelog
 
-### 2020-06-24
-
-- Initial release of image.
+See a list of merged pull requests [here](https://github.com/mikenye/docker-minecraft_bedrock_server/pulls?q=is%3Apr+is%3Aclosed+is%3Amerged)
