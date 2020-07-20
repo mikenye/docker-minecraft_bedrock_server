@@ -79,7 +79,7 @@ echo "Releasing server from 'save hold'..."
 
 # Compress backup
 echo "Compressing backup..."
-cd "/opt/minecraft/worlds_backup/${WORLD_DIR}"
+cd "/opt/minecraft/worlds_backup/${WORLD_DIR}" || exit 1
 # shellcheck disable=SC2016
 tar cvJf "${BACKUP_DATETIME}.tar.xz" "${BACKUP_DATETIME}" | stdbuf -o0 awk '{print "  + " $0}'
 
