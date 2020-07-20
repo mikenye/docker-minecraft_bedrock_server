@@ -6,11 +6,8 @@ echo "======= BACKUP OPERATION BEGIN ======="
 # Performing a save resume in case of failed backup
 /usr/local/bin/sendcmd save resume
 
-# Get PID of s6-log process for bedrock_server
-S6_LOG_PID=$(ps aux | grep s6-log | grep "/var/log/bedrock_server" | tr -s " " | cut -d " " -f 2)
-
 # Force a log rotation
-kill -s SIGALRM $S6_LOG_PID
+kill -s SIGALRM $(pgrep s6-log)
 
 # Trigger a backup
 echo "Placing server into 'save hold'..."
@@ -45,16 +42,16 @@ for i in "${BKUP[@]}"; do
     i=$(echo "$i" | sed 's/^ *//g' | sed 's/\r//g')
 
     # For each entry given, get the path, file and offset
-    WORLD_DIR=$(echo $i | cut -d '/' -f 1)
-    WORLD_FILE=$(basename $(echo $i | cut -d ':' -f 1))
-    WORLD_FILE_OFFSET=$(echo $i | cut -d ':' -f 2)
+    WORLD_DIR=$(echo "$i" | cut -d '/' -f 1)
+    WORLD_FILE=$(basename $(echo "$i" | cut -d ':' -f 1))
+    WORLD_FILE_OFFSET=$(echo "$i" | cut -d ':' -f 2)
 
     # Create backup directory
     BACKUP_DESTINATION="/opt/minecraft/worlds_backup/${WORLD_DIR}/${BACKUP_DATETIME}"
     mkdir -p "${BACKUP_DESTINATION}"
 
     # Copy specified backup files into backup dir & truncate files to specified offset
-    cd "/opt/minecraft/worlds/${WORLD_DIR}"
+    cd "/opt/minecraft/worlds/${WORLD_DIR}" || exit 1
     find . \
         -type f \
         -name "${WORLD_FILE}" \
