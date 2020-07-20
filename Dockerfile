@@ -6,6 +6,8 @@ ENV PUID=1000 \
     BACKUP_FREQUENCY=1 \
     BACKUP_RETENTION=24
 
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
 RUN set -x && \
     apt-get update && \
     apt-get install -y --no-install-recommends \
@@ -46,11 +48,11 @@ RUN set -x && \
     ln -s /opt/minecraft/permissions/permissions.json /opt/minecraft/permissions.json && \
     # Get mc-status
     git clone https://github.com/itzg/mc-monitor.git /src/mc-monitor && \
-    cd /src/mc-monitor && \
+    pushd /src/mc-monitor && \
     go get && \
     go build && \
     cp -v mc-monitor /usr/local/bin && \
-    cd / && \
+    popd / && \
     # Deploy s6 overlay
     curl -s https://raw.githubusercontent.com/mikenye/deploy-s6-overlay/master/deploy-s6-overlay.sh | sh && \
     # Clean up
@@ -70,8 +72,9 @@ RUN set -x && \
     rm -rf /src /tmp/* /var/lib/apt/lists/* && \
     find /var/log -type f -iname "*log" -exec truncate --size 0 {} \; && \
     # Document minecraft version
-    cd /opt/minecraft && \
-    echo $(LD_LIBRARY_PATH=. timeout 5s ./bedrock_server | grep -i version) | cut -d " " -f 5 > /MINECRAFT_VERSION && \
+    pushd /opt/minecraft && \
+    LD_LIBRARY_PATH=. timeout 5s ./bedrock_server | grep -i version | cut -d " " -f 5 > /MINECRAFT_VERSION && \
+    popd && \
     cat /MINECRAFT_VERSION && \
     # If /MINECRAFT_VERSION is empty, then raise an error (should have version inside)
     if [ ! -s /MINECRAFT_VERSION ]; then exit 1; fi
