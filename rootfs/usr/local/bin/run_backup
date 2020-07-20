@@ -80,6 +80,7 @@ echo "Releasing server from 'save hold'..."
 # Compress backup
 echo "Compressing backup..."
 cd "/opt/minecraft/worlds_backup/${WORLD_DIR}"
+# shellcheck disable=SC2016
 tar cvJf "${BACKUP_DATETIME}.tar.xz" "${BACKUP_DATETIME}" | stdbuf -o0 awk '{print "  + " $0}'
 
 # Clean up files now they're compressed
