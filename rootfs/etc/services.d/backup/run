@@ -2,7 +2,7 @@
 # shellcheck shell=bash
 
 # Wait for $BACKUP_FREQUENCY hours
-sleep $(expr $BACKUP_FREQUENCY \* 60 \* 60 )
+sleep $((BACKUP_FREQUENCY * 60 * 60 ))
 
 # Run backup
 # shellcheck disable=SC2016
