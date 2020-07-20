@@ -5,7 +5,9 @@
 sleep $(expr $BACKUP_FREQUENCY \* 60 \* 60 )
 
 # Run backup
+# shellcheck disable=SC2016
 /usr/local/bin/manual_backup 2>&1 | stdbuf -o0 awk '{print "[backup] [" strftime("%Y/%m/%d %H:%M:%S", systime()) " INFO] " $0}'
 
 # Remove old backups
+# shellcheck disable=SC2016
 /usr/local/bin/clean_backups 2>&1 | stdbuf -o0 awk '{print "[backup] [" strftime("%Y/%m/%d %H:%M:%S", systime()) " INFO] " $0}'
