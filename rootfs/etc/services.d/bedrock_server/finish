@@ -1,4 +1,4 @@
 #!/usr/bin/execlineb -S1
-# shellcheck shell=sh
+# shellcheck disable
 
 if { s6-test ${1} -eq 0 } s6-svscanctl -t /var/run/s6/services
