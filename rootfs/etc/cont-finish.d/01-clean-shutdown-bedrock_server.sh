@@ -2,8 +2,7 @@
 # shellcheck shell=bash
 
 # Check if bedrock_server is running, if so shutdown cleanly
-pgrep bedrock_server > /dev/null 2>&1
-if [ "$?" -eq "0" ]; then
+if pgrep bedrock_server > /dev/null 2>&1; then
 
     /usr/local/bin/sendcmd stop
 
