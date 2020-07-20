@@ -3,7 +3,7 @@
 #set -x
 
 # Change to minecraft dir
-cd /opt/minecraft
+cd /opt/minecraft || exit 1
 
 LD_LIBRARY_PATH=. s6-setuidgid minecraft ./bedrock_server
 
