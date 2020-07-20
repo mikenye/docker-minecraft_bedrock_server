@@ -52,7 +52,7 @@ RUN set -x && \
     go get && \
     go build && \
     cp -v mc-monitor /usr/local/bin && \
-    popd / && \
+    popd && \
     # Deploy s6 overlay
     curl -s https://raw.githubusercontent.com/mikenye/deploy-s6-overlay/master/deploy-s6-overlay.sh | sh && \
     # Clean up
