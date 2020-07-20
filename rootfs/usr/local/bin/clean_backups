@@ -12,7 +12,7 @@ else
   # shellcheck disable=SC2016
   find /opt/minecraft/worlds_backup \
     -type f \
-    -cmin +"$(($BACKUP_RETENTION * 60))" \
+    -cmin +"$((BACKUP_RETENTION * 60))" \
     -exec rm -v {} \; | stdbuf -o0 awk '{print "  - " $0}'
 
   find /opt/minecraft/worlds_backup \
