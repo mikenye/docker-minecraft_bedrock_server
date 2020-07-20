@@ -58,12 +58,13 @@ for i in "${BKUP[@]}"; do
     find . \
         -type f \
         -name "${WORLD_FILE}" \
-        -print0 | while read -d $'\0' file
+        -print0 | while read -r -d $'\0' file
     do
+        # shellcheck disable=SC2001
         file=$(echo "${file}" | sed "s|^\./||")
-        mkdir -p $(dirname "${BACKUP_DESTINATION}/${file}")
+        mkdir -p "$(dirname "${BACKUP_DESTINATION}/${file}")"
         cp "./${file}" "${BACKUP_DESTINATION}/${file}"
-        truncate -s $WORLD_FILE_OFFSET "${BACKUP_DESTINATION}/${file}"
+        truncate -s "$WORLD_FILE_OFFSET" "${BACKUP_DESTINATION}/${file}"
     done
 
     # Also copy settings, whitelist and permissions for this point in time
