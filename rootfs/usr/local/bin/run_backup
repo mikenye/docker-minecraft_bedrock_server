@@ -7,7 +7,7 @@ echo "======= BACKUP OPERATION BEGIN ======="
 /usr/local/bin/sendcmd save resume
 
 # Force a log rotation
-kill -s SIGALRM $(pgrep s6-log)
+kill -s SIGALRM "$(pgrep s6-log)"
 
 # Trigger a backup
 echo "Placing server into 'save hold'..."
@@ -43,7 +43,7 @@ for i in "${BKUP[@]}"; do
 
     # For each entry given, get the path, file and offset
     WORLD_DIR=$(echo "$i" | cut -d '/' -f 1)
-    WORLD_FILE=$(basename $(echo "$i" | cut -d ':' -f 1))
+    WORLD_FILE=$(basename "$(echo "$i" | cut -d ':' -f 1)")
     WORLD_FILE_OFFSET=$(echo "$i" | cut -d ':' -f 2)
 
     # Create backup directory
