@@ -12,7 +12,7 @@ This container provides a Minecraft Bedrock server!
 
 ## Quick Start - Example with `docker run`
 
-### Create docker volumes:
+### Create docker volumes
 
 ```
 docker volume create minecraft_worlds
@@ -21,7 +21,7 @@ docker volume create minecraft_whitelist
 docker volume create minecraft_permissions
 ```
 
-### Create container:
+### Create container
 
 ```
 docker run \
@@ -43,19 +43,19 @@ docker run \
     mikenye/minecraft_bedrock_server
 ```
 
-### Whitelist yourself:
+### Whitelist yourself
 
 ```
 docker exec mc sendcmd whitelist add "yourself"
 ```
 
-### Op yourself:
+### Op yourself
 
 ```
 docker exec mc sendcmd op "yourself"
 ```
 
-### Watch container logs:
+### Watch container logs
 
 ```
 docker logs -f mc
@@ -63,7 +63,7 @@ docker logs -f mc
 
 ## Quick Start - Example with `docker-compose`
 
-### Contents of `docker-compose.yml`:
+### Contents of `docker-compose.yml`
 
 ```
 version: '3.8'
@@ -184,13 +184,13 @@ Manual backups can be triggered via the `manual_backup` command, see below. Manu
 The backup process is as follows:
 
 1. `bedrock_server` is placed into `save hold` mode to allow a backup to take place while the server is running.
-2. Wait intil `save query` reports that the server is ready for an online backup to take place.
-3. The files returned in `save query` are copied to temporary directory `/opt/minecraft/worlds_backup/<world name>/<current datetime>`.
-4. The files copied are truncated to the sizes returned in `save query`.
-5. The files copied are compressed into a `/opt/minecraft/worlds_backup/<world name>/<current datetime>.tar.xz`.
-6. The temporary directory `/opt/minecraft/worlds_backup/<world name>/<current datetime>` is removed.
-7. Any backups files in `/opt/minecraft/worlds_backup` older than `BACKUP_RETENTION` hours are removed.
-8. Any empty directories in `/opt/minecraft/worlds_backup` are removed.
+1. Wait intil `save query` reports that the server is ready for an online backup to take place.
+1. The files returned in `save query` are copied to temporary directory `/opt/minecraft/worlds_backup/<world name>/<current datetime>`.
+1. The files copied are truncated to the sizes returned in `save query`.
+1. The files copied are compressed into a `/opt/minecraft/worlds_backup/<world name>/<current datetime>.tar.xz`.
+1. The temporary directory `/opt/minecraft/worlds_backup/<world name>/<current datetime>` is removed.
+1. Any backups files in `/opt/minecraft/worlds_backup` older than `BACKUP_RETENTION` hours are removed.
+1. Any empty directories in `/opt/minecraft/worlds_backup` are removed.
 
 Backups are owned by `root`. This is by design so that in the event the server becomes compromised, your worldfile backups should not be able to be removed (as the server binary runs as an unprivileged user).
 
@@ -255,6 +255,4 @@ I also have a [Discord channel](https://discord.gg/NMbHskw), feel free to [join]
 
 ## Changelog
 
-### 2020-06-24
-
-- Initial release of image.
+See a list of merged pull requests [here](https://github.com/mikenye/docker-minecraft_bedrock_server/pulls?q=is%3Apr+is%3Aclosed+is%3Amerged)

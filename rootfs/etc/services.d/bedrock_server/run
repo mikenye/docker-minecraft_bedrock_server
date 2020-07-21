@@ -11,7 +11,7 @@ rm /tmp/bedrock_server_pipe 2> /dev/null || true
 mkfifo /tmp/bedrock_server_pipe
 
 # Change to server directory
-cd /opt/minecraft
+cd /opt/minecraft || exit 1
 
 # Start server
 tmux new-session -s bedrock_server -d -n "bedrock_server" "/usr/local/bin/startserver"
@@ -20,7 +20,8 @@ tmux new-session -s bedrock_server -d -n "bedrock_server" "/usr/local/bin/starts
 tmux pipe-pane -o -t bedrock_server 'cat >> /tmp/bedrock_server_pipe'
 
 # View server output
-cat /tmp/bedrock_server_pipe | stdbuf -o0 awk '{print "[bedrock_server] " $0}'
+# shellcheck disable=SC2016
+stdbuf -o0 awk '{print "[bedrock_server] " $0}' < /tmp/bedrock_server_pipe
 
 # Exit code matching bedrock_server exit code
-exit $(cat /opt/minecraft/.exitcode)
+exit "$(cat /opt/minecraft/.exitcode)"
