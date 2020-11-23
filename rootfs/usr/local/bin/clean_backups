@@ -1,26 +1,28 @@
 #!/usr/bin/env bash
 
-echo "======= BACKUP RETENTION CLEAN-UP BEGIN ======="
+flock --exclusive --nonblock /tmp/backup.lock echo "======= BACKUP RETENTION CLEAN-UP BEGIN ======="
 
 # Set up timezone
 if [ -z "${BACKUP_RETENTION}" ]; then
-  echo "WARNING: BACKUP_RETENTION environment variable not set!"
+  flock --exclusive --nonblock /tmp/backup.lock echo "WARNING: BACKUP_RETENTION environment variable not set!"
 else
 
-  echo "Removing backups older than ${BACKUP_RETENTION} hours..."
+  flock --exclusive --nonblock /tmp/backup.lock echo "Removing backups older than ${BACKUP_RETENTION} hours..."
 
   # shellcheck disable=SC2016
-  find /opt/minecraft/worlds_backup \
-    -type f \
-    -cmin +"$((BACKUP_RETENTION * 60))" \
-    -exec rm -v {} \; | stdbuf -o0 awk '{print "  - " $0}'
+  flock --exclusive --nonblock /tmp/backup.lock \
+    find /opt/minecraft/worlds_backup \
+      -type f \
+      -cmin +"$((BACKUP_RETENTION * 60))" \
+      -exec rm -v {} \; | stdbuf -o0 awk '{print "  - " $0}'
 
-  find /opt/minecraft/worlds_backup \
-    -type d \
-    -empty \
-    -delete
+  flock --exclusive --nonblock /tmp/backup.lock \
+    find /opt/minecraft/worlds_backup \
+      -type d \
+      -empty \
+      -delete
 
 fi
 
-echo "======= BACKUP RETENTION CLEAN-UP FINISH ======="
-echo ""
+flock --exclusive --nonblock /tmp/backup.lock echo "======= BACKUP RETENTION CLEAN-UP FINISH ======="
+flock --exclusive --nonblock /tmp/backup.lock echo ""
