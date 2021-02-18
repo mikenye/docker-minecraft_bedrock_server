@@ -14,7 +14,7 @@ on:
 
 jobs:
   deploy_to_dockerhub:
-    name: Deploy to DockerHub (Multi-Arch)
+    name: Deploy to DockerHub
     runs-on: ubuntu-18.04
 
     # Set job-wide environment variables
