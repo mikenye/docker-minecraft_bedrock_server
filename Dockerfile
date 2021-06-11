@@ -18,7 +18,6 @@ RUN set -x && \
       gcc \
       git \
       gnupg2 \
-      golang-go \
       libc-dev \
       libcurl4 \
       procps \
@@ -46,6 +45,11 @@ RUN set -x && \
     touch /opt/minecraft/permissions.json && \
     mv -v /opt/minecraft/permissions.json /opt/minecraft/permissions/permissions.json && \
     ln -s /opt/minecraft/permissions/permissions.json /opt/minecraft/permissions.json && \
+    # Get go (for mc-status)
+    curl --location -o /src/go.tar.gz https://golang.org/dl/go1.16.5.linux-amd64.tar.gz && \
+    tar -C /usr/local -xzf /src/go.tar.gz && \
+    PATH=$PATH:/usr/local/go/bin && \
+    export PATH && \
     # Get mc-status
     git clone https://github.com/itzg/mc-monitor.git /src/mc-monitor && \
     pushd /src/mc-monitor && \
