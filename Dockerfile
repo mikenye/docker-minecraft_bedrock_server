@@ -73,6 +73,7 @@ RUN set -x && \
     find /var/log -type f -iname "*log" -exec truncate --size 0 {} \; && \
     # Document minecraft version
     pushd /opt/minecraft && \
+    chmod a+x ./bedrock_server && \
     LD_LIBRARY_PATH=. timeout 5s ./bedrock_server | grep -i version | cut -d " " -f 5 > /MINECRAFT_VERSION || true && \
     popd && \
     cat /MINECRAFT_VERSION && \
