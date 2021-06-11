@@ -54,7 +54,8 @@ RUN set -x && \
     cp -v mc-monitor /usr/local/bin && \
     popd && \
     # Deploy s6 overlay
-    curl -s https://raw.githubusercontent.com/mikenye/deploy-s6-overlay/master/deploy-s6-overlay.sh | sh && \
+    curl -o /tmp/deploy-s6-overlay.sh -s https://raw.githubusercontent.com/mikenye/deploy-s6-overlay/master/deploy-s6-overlay.sh && \
+    bash /tmp/deploy-s6-overlay.sh && \
     # Clean up
     apt-get remove -y \
       ca-certificates \
