@@ -18,7 +18,6 @@ RUN set -x && \
       gcc \
       git \
       gnupg2 \
-      golang-go \
       libc-dev \
       libcurl4 \
       procps \
@@ -46,15 +45,23 @@ RUN set -x && \
     touch /opt/minecraft/permissions.json && \
     mv -v /opt/minecraft/permissions.json /opt/minecraft/permissions/permissions.json && \
     ln -s /opt/minecraft/permissions/permissions.json /opt/minecraft/permissions.json && \
-    # Get mc-status
+    # Get go (for mc-monitor)
+    curl --location -o /src/go.tar.gz https://golang.org/dl/go1.16.5.linux-amd64.tar.gz && \
+    tar -C /usr/local -xzf /src/go.tar.gz && \
+    PATH=$PATH:/usr/local/go/bin && \
+    export PATH && \
+    # Get mc-monitor
     git clone https://github.com/itzg/mc-monitor.git /src/mc-monitor && \
     pushd /src/mc-monitor && \
     go get && \
     go build && \
     cp -v mc-monitor /usr/local/bin && \
     popd && \
+    # Remove go (no longer required, mc-monitor is built)
+    rm -rf /usr/local/go && \
     # Deploy s6 overlay
-    curl -s https://raw.githubusercontent.com/mikenye/deploy-s6-overlay/master/deploy-s6-overlay.sh | sh && \
+    curl -o /tmp/deploy-s6-overlay.sh -s https://raw.githubusercontent.com/mikenye/deploy-s6-overlay/master/deploy-s6-overlay.sh && \
+    bash /tmp/deploy-s6-overlay.sh && \
     # Clean up
     apt-get remove -y \
       ca-certificates \
@@ -73,6 +80,7 @@ RUN set -x && \
     find /var/log -type f -iname "*log" -exec truncate --size 0 {} \; && \
     # Document minecraft version
     pushd /opt/minecraft && \
+    chmod a+x ./bedrock_server && \
     LD_LIBRARY_PATH=. timeout 5s ./bedrock_server | grep -i version | cut -d " " -f 5 > /MINECRAFT_VERSION || true && \
     popd && \
     cat /MINECRAFT_VERSION && \
