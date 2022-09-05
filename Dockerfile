@@ -1,3 +1,14 @@
+FROM golang:1.19.0-bullseye AS mc-monitor-builder
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# Get & build mc-monitor
+RUN git clone https://github.com/itzg/mc-monitor.git /src/mc-monitor && \
+    pushd /src/mc-monitor && \
+    go get && \
+    go build && \
+    cp -v mc-monitor /usr/local/bin
+
 FROM debian:bullseye
 
 ENV PUID=1000 \
@@ -8,6 +19,8 @@ ENV PUID=1000 \
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
+COPY --from=mc-monitor-builder /usr/local/bin/mc-monitor /usr/local/bin/mc-monitor
+
 RUN set -x && \
     apt-get update && \
     apt-get install -y --no-install-recommends \
@@ -15,10 +28,10 @@ RUN set -x && \
       curl \
       file \
       gawk \
-      gcc \
-      git \
+      # gcc \
+      # git \
       gnupg2 \
-      libc-dev \
+      # libc-dev \
       libcurl4 \
       procps \
       tmux \
@@ -46,20 +59,6 @@ RUN set -x && \
     touch /opt/minecraft/permissions.json && \
     mv -v /opt/minecraft/permissions.json /opt/minecraft/permissions/permissions.json && \
     ln -s /opt/minecraft/permissions/permissions.json /opt/minecraft/permissions.json && \
-    # Get go (for mc-monitor)
-    curl --location -o /src/go.tar.gz https://golang.org/dl/go1.16.5.linux-amd64.tar.gz && \
-    tar -C /usr/local -xzf /src/go.tar.gz && \
-    PATH=$PATH:/usr/local/go/bin && \
-    export PATH && \
-    # Get mc-monitor
-    git clone https://github.com/itzg/mc-monitor.git /src/mc-monitor && \
-    pushd /src/mc-monitor && \
-    go get && \
-    go build && \
-    cp -v mc-monitor /usr/local/bin && \
-    popd && \
-    # Remove go (no longer required, mc-monitor is built)
-    rm -rf /usr/local/go && \
     # Deploy s6 overlay
     curl -o /tmp/deploy-s6-overlay.sh -s https://raw.githubusercontent.com/mikenye/deploy-s6-overlay/master/deploy-s6-overlay.sh && \
     bash /tmp/deploy-s6-overlay.sh && \
