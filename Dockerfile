@@ -1,4 +1,4 @@
-FROM debian:stable-slim
+FROM debian:bullseye
 
 ENV PUID=1000 \
     PGID=1000 \
