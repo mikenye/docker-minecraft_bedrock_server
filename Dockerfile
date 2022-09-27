@@ -40,7 +40,7 @@ RUN set -x && \
       && \
     # Get latest server binary
     #MINECRAFT_LINUX_SERVER_URL=$(curl "https://www.minecraft.net/en-us/download/server/bedrock" | grep "serverBedrockLinux" | grep -oE "href=\"https://.*/.*\.zip" | cut -d '"' -f 2) && \
-    MINECRAFT_LINUX_SERVER_URL="https://minecraft.azureedge.net/bin-linux/bedrock-server-1.19.22.01.zip" && \
+    MINECRAFT_LINUX_SERVER_URL="https://minecraft.azureedge.net/bin-linux/bedrock-server-1.19.30.04.zip" && \
     # Download bedrock server
     mkdir -p /src && \
     curl --location --output /src/bedrock-server.zip "$MINECRAFT_LINUX_SERVER_URL" && \
