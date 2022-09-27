@@ -251,7 +251,7 @@ Adding/removing server permissions can be done by either:
 
 Please feel free to [open an issue on the project's GitHub](https://github.com/mikenye/docker-minecraft_bedrock_server/issues).
 
-I also have a [Discord channel](https://discord.gg/NMbHskw), feel free to [join](https://discord.gg/NMbHskw) and converse.
+I also have a [Discord channel](https://discord.gg/2p4AG9XrUU), feel free to [join](https://discord.gg/NMbHskw) and converse.
 
 ## Changelog
 
