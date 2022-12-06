@@ -233,9 +233,9 @@ Adding/removing gamertags to/from server's whitelist can be done by either:
 
 - Editing the `whitelist.json` file and issuing the server commend `whitelist reload` (eg: `docker exec <container> sendcmd whitelist reload`); or
 - Using server commands, eg:
-  - Adding: `docker exec <container> sendcmd whitelist add <Gamertag>`.
-  - Removing: `docker exec <container> sendcmd whitelist remove <Gamertag>`.
-  - Note: If there is a white-space in the Gamertag you need to enclose it with double quates: `docker exec <container> sendcmd whitelist add "Example Name"`.
+    - Adding: `docker exec <container> sendcmd whitelist add <Gamertag>`.
+    - Removing: `docker exec <container> sendcmd whitelist remove <Gamertag>`.
+    - Note: If there is a white-space in the Gamertag you need to enclose it with double quates: `docker exec <container> sendcmd whitelist add "Example Name"`.
 
 ## Permissions Management
 
@@ -243,9 +243,9 @@ Adding/removing server permissions can be done by either:
 
 - Editing the `permissions.json` file and issuing the server commend `permission reload` (eg: `docker exec <container> sendcmd permission reload`); or
 - Using server commands, eg:
-  - Opping: `docker exec <container> sendcmd op <player>`.
-  - Deopping: `docker exec <container> sendcmd deop <player>`.
-  - Note: If there is a white-space in the player name you need to enclose it with double quates: `docker exec <container> sendcmd op "Example Name"`.
+    - Opping: `docker exec <container> sendcmd op <player>`.
+    - Deopping: `docker exec <container> sendcmd deop <player>`.
+    - Note: If there is a white-space in the player name you need to enclose it with double quates: `docker exec <container> sendcmd op "Example Name"`.
 
 ## Getting help
 
