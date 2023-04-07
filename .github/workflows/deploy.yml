@@ -30,7 +30,6 @@ jobs:
 
   deploy_dockerhub:
     name: Deploy Docker Hub
-    needs: [hadolint]
     runs-on: ubuntu-latest
 
     steps:
