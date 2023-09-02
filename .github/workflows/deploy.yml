@@ -126,7 +126,6 @@ jobs:
 
   deploy_ghrc:
     name: Deploy ghcr.io
-    needs: [hadolint]
     runs-on: ubuntu-latest
 
     steps:
