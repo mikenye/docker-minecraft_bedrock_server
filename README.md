@@ -7,7 +7,7 @@ This container provides a Minecraft Bedrock server!
 - Ability to send server commands via `docker exec` (without attaching), useful for scripting.
 - Automated and regular online worldfile backups (using `save hold`, `save query` & `save resume`), with backup rotation.
 - Clean shutdown of `bedrock_server` on container stop.
-- All `server.properties` variables exposed via environment variables.
+- Supported `server.properties` options can be configured via environment variables.
 - `bedrock_server` binary runs as an unprivileged user.
 
 ## Quick Start - Example with `docker run`
@@ -17,7 +17,7 @@ This container provides a Minecraft Bedrock server!
 ```
 docker volume create minecraft_worlds
 docker volume create minecraft_backups
-docker volume create minecraft_whitelist
+docker volume create minecraft_allowlist
 docker volume create minecraft_permissions
 ```
 
@@ -34,19 +34,21 @@ docker run \
     -e MINECRAFT_GAMEMODE="survival" \
     -e MINECRAFT_DIFFICULTY="easy" \
     -e MINECRAFT_LEVEL_NAME="Distant Lands" \
-    -e MINECRAFT_WHITE_LIST="true" \
+    -e MINECRAFT_ONLINE_MODE="true" \
+    -e MINECRAFT_ALLOW_LIST="true" \
     -v minecraft_worlds:/opt/minecraft/worlds \
     -v minecraft_backups:/opt/minecraft/worlds_backup \
-    -v minecraft_whitelist:/opt/minecraft/whitelist \
+    -v minecraft_allowlist:/opt/minecraft/allowlist \
     -v minecraft_permissions:/opt/minecraft/permissions \
     -p 19132:19132/udp \
+    -p 19133:19133/udp \
     mikenye/minecraft_bedrock_server
 ```
 
-### Whitelist yourself
+### Allowlist yourself
 
 ```
-docker exec mc sendcmd whitelist add "yourself"
+docker exec mc sendcmd allowlist add "yourself"
 ```
 
 ### Op yourself
@@ -61,7 +63,7 @@ docker exec mc sendcmd op "yourself"
 docker logs -f mc
 ```
 
-## Quick Start - Example with `docker-compose`
+## Quick Start - Example with Docker Compose
 
 ### Contents of `docker-compose.yml`
 
@@ -73,7 +75,7 @@ volumes:
     driver: local
   minecraft_backups:
     driver: local
-  minecraft_whitelist:
+  minecraft_allowlist:
     driver: local
   minecraft_permissions:
     driver: local
@@ -86,22 +88,24 @@ services:
     restart: always
     ports:
       - "19132:19132/udp"
+      - "19133:19133/udp"
     environment:
       TZ: "Australia/Perth"
       MINECRAFT_SERVER_NAME: "Distant Lands Server"
       MINECRAFT_GAMEMODE: "survival"
       MINECRAFT_DIFFICULTY: "easy"
       MINECRAFT_LEVEL_NAME: "Distant Lands"
-      MINECRAFT_WHITE_LIST: "true"
+      MINECRAFT_ONLINE_MODE: "true"
+      MINECRAFT_ALLOW_LIST: "true"
     volumes:
       - "minecraft_worlds:/opt/minecraft/worlds"
       - "minecraft_backups:/opt/minecraft/worlds_backup"
-      - "minecraft_whitelist:/opt/minecraft/whitelist"
+      - "minecraft_allowlist:/opt/minecraft/allowlist"
       - "minecraft_permissions:/opt/minecraft/permissions"
 
 ```
 
-After you've issued the `docker-compose up -d` to bring the environment online, you can then whitelist & op yourself as-per the above commands.
+After you've run `docker compose up -d` to bring the environment online, you can then allowlist and op yourself as shown above.
 
 ## Environment Variables
 
@@ -126,8 +130,10 @@ All of the variables below are optional. If not set, the default value from `ser
 | `MINECRAFT_DIFFICULTY`                               | Sets the difficulty of the world. Allowed values: "`peaceful`", "`easy`", "`normal`", or "`hard`". |
 | `MINECRAFT_ALLOW_CHEATS`                             | If true then cheats like commands can be used. Allowed values: "true" or "`false`". |
 | `MINECRAFT_MAX_PLAYERS`                              | The maximum number of players that can play on the server. Allowed values: Any positive integer. |
-| `MINECRAFT_ONLINE_MODE`                              | If true then all connected players must be authenticated to Xbox Live. Clients connecting to remote (non-LAN) servers will always require Xbox Live authentication regardless of this setting. If the server accepts connections from the Internet, then it's highly recommended to enable online-mode. Allowed values: "`true`" or "`false`".
-| `MINECRAFT_WHITE_LIST`                               | If true then all connected players must be listed in the separate whitelist.json file. Allowed values: "`true`" or "`false`".
+| `MINECRAFT_ONLINE_MODE`                              | If true then all connected players must be authenticated to Xbox Live. Clients connecting to remote (non-LAN) servers will always require Xbox Live authentication regardless of this setting. If the server accepts connections from the Internet, then it's highly recommended to enable online-mode. Allowed values: "`true`" or "`false`". |
+| `MINECRAFT_ALLOW_LIST`                               | If true then all connected players must be listed in the separate allowlist.json file. Current Bedrock Dedicated Server releases require `online-mode=true` when `allow-list=true`. Allowed values: "`true`" or "`false`". |
+| `MINECRAFT_SERVER_PORT_IPV4`                         | Sets the IPv4 UDP server port. Default is `19132`. Allowed values: Any valid UDP port. |
+| `MINECRAFT_SERVER_PORT_IPV6`                         | Sets the IPv6 UDP server port. Default is `19133`. Allowed values: Any valid UDP port. |
 | `MINECRAFT_VIEW_DISTANCE`                            | The maximum allowed view distance in number of chunks. Allowed values: Any positive integer. |
 | `MINECRAFT_TICK_DISTANCE`                            | The world will be ticked this many chunks away from any player. Allowed values: Integers in the range [`4`, `12`]. |
 | `MINECRAFT_PLAYER_IDLE_TIMEOUT`                      | After a player has idled for this many minutes they will be kicked. If set to `0` then players can idle indefinitely. Allowed values: Any non-negative integer. |
@@ -146,7 +152,7 @@ All of the variables below are optional. If not set, the default value from `ser
 
 ## Paths
 
-The following paths should be mapped to external volumes to prevent losing your worlds and so your `whitelist.json` & `permissions.json` persist.
+The following paths should be mapped to external volumes to prevent losing your worlds and so your `allowlist.json` & `permissions.json` persist.
 
 You shouldn't map `server.properties`, as this file is created on container start using the environment variables `MINECRAFT_*` (see above).
 
@@ -154,7 +160,7 @@ You shouldn't map `server.properties`, as this file is created on container star
 |----------------------------------|----------------------------------------|
 | `/opt/minecraft/worlds`          | Location of the live world files.      |
 | `/opt/minecraft/worlds_backup`   | Location of the backed up world files. |
-| `/opt/minecraft/whitelist`       | Location of `whitelist.json`.          |
+| `/opt/minecraft/allowlist`       | Location of `allowlist.json`.          |
 | `/opt/minecraft/permissions`     | Location of `permissions.json`.        |
 
 ## Ports
@@ -163,15 +169,31 @@ The container exposes **UDP** ports `19132` for IPv4 and `19133` for IPv6.
 
 When publishing the container's ports to the host, you should add `/udp` to your publish argument. For example:
 
-- `docker run -p 19132:19132/udp ...`
+- IPv4 only: `docker run -p 19132:19132/udp ...`
+- IPv4 and IPv6: `docker run -p 19132:19132/udp -p 19133:19133/udp ...`
 - For `docker-compose.yml`:
 
 ```
 ...
   ports:
     - "19132:19132/udp"
+    - "19133:19133/udp"
 ...
 ```
+
+If you change `MINECRAFT_SERVER_PORT_IPV4` or `MINECRAFT_SERVER_PORT_IPV6`, update your published UDP port mappings to match.
+
+## Troubleshooting Connections
+
+To verify the server is listening inside the container:
+
+```
+docker exec mc mc-monitor status-bedrock
+docker exec mc ss -lunp
+docker port mc
+```
+
+For iOS and iPadOS clients, make sure Minecraft has local network access enabled in `Settings` > `Privacy & Security` > `Local Network` > `Minecraft`. If this is disabled, LAN discovery or joining can fail even when the server is healthy, including with `initialconnection -13` errors.
 
 ## Backups
 
@@ -184,7 +206,7 @@ Manual backups can be triggered via the `manual_backup` command, see below. Manu
 The backup process is as follows:
 
 1. `bedrock_server` is placed into `save hold` mode to allow a backup to take place while the server is running.
-1. Wait intil `save query` reports that the server is ready for an online backup to take place.
+1. Wait until `save query` reports that the server is ready for an online backup to take place.
 1. The files returned in `save query` are copied to temporary directory `/opt/minecraft/worlds_backup/<world name>/<current datetime>`.
 1. The files copied are truncated to the sizes returned in `save query`.
 1. The files copied are compressed into a `/opt/minecraft/worlds_backup/<world name>/<current datetime>.tar.xz`.
@@ -194,7 +216,7 @@ The backup process is as follows:
 
 Backups are owned by `root`. This is by design so that in the event the server becomes compromised, your worldfile backups should not be able to be removed (as the server binary runs as an unprivileged user).
 
-To restore from backup, you can uncompress the backup file (`tar -xJvf <.tar.xz file>`) and copy the files into the `/opt/minecraft/worlds/<world name>`, and start up the server. You may need `xz-tools` for your `tar` to be able to understand `.xz` files.
+To restore from backup, you can uncompress the backup file (`tar -xJvf <.tar.xz file>`) and copy the files into the `/opt/minecraft/worlds/<world name>`, and start up the server. You may need `xz-utils` for your `tar` to be able to understand `.xz` files.
 
 ## Management Commands
 
@@ -219,33 +241,33 @@ The following server commands can be used with `docker exec <container> sendcmd 
 |---------|-------------|---------|
 | `kick <player name or xuid> <reason>` | Immediately kicks a player. The reason will be shown on the kicked players screen. | `docker exec mc sendcmd kick "somegriefer" "Griefing not tolerated."`
 | `stop` | Shuts down the server **and container** gracefully. | `docker exec mc sendcmd stop` |
-| `save <hold / resume / query>` | Used to make atomic backups while the server is running. See the backup section for more information, as the backup process is automated in this container. | `docker exec mc manual_backup` |
-| `whitelist <on / off / list / reload>` | `on` and `off` turns the whitelist on and off. Note that this does not change the value in the server.properties file - you should use the `MINECRAFT_WHITE_LIST` variable! `list` prints the current whitelist used by the server. `reload` makes the server reload the whitelist from the file. See the Whitelist Management section below for more information. | `docker exec mc sendcmd whitelist list` |
-| `whitelist <add / remove> <name>` | Adds or removes a player from the whitelist file. The name parameter should be the Xbox Gamertag of the player you want to add or remove. You don't need to specify a XUID here, it will be resolved the first time the player connects. See the Whitelist section for more information. | `docker exec mc sendcmd whitelist add "myfriendtotoro"` |
+| `save <hold / resume / query>` | Used to make atomic backups while the server is running. See the backup section for more information, as the backup process is automated in this container. | `docker exec mc sendcmd save query` |
+| `allowlist <on / off / list / reload>` | `on` and `off` turns the allowlist on and off. Note that this does not change the value in the server.properties file - you should use the `MINECRAFT_ALLOW_LIST` variable! `list` prints the current allowlist used by the server. `reload` makes the server reload the allowlist from the file. See the allowlist Management section below for more information. | `docker exec mc sendcmd allowlist list` |
+| `allowlist <add / remove> <name>` | Adds or removes a player from the allowlist file. The name parameter should be the Xbox Gamertag of the player you want to add or remove. You don't need to specify a XUID here, it will be resolved the first time the player connects. See the allowlist section for more information. | `docker exec mc sendcmd allowlist add "myfriendtotoro"` |
 | `permission <list / reload>` | `list` prints the current used operator list. `reload` makes the server reload the operator list from the ops file. See the Permissions section below for more information. | `docker exec mc sendcmd permission list` |
 | `op <player>` | Promote a player to `operator`. This will also persist if the player is authenticated to XBL. If the player is not connected to XBL, the player is promoted for the current server session and it will not be persisted. | `docker exec mc sendcmd op "myfriendtotoro"` |
-| `deop <player>` | Demote a player to `member`. This will also persist if the player is authenticated to XBL. | `docker exec mc sendcmd op "myfriendtotoro"` |
-| `changesetting <setting> <value>` | Changes a server setting without having to restart the server. Currently only two settings are supported to be changed, `allow-cheats` (`true` or `false`) and `difficulty` (`peaceful`, `easy`, `normal` or `hard`). They do not modify the value that's specified in `server.properties` (which is set via environment variables). | `docker exec mc sendcmd difficulty peaceful` |
+| `deop <player>` | Demote a player to `member`. This will also persist if the player is authenticated to XBL. | `docker exec mc sendcmd deop "myfriendtotoro"` |
+| `changesetting <setting> <value>` | Changes a server setting without having to restart the server. Currently only two settings are supported to be changed, `allow-cheats` (`true` or `false`) and `difficulty` (`peaceful`, `easy`, `normal` or `hard`). They do not modify the value that's specified in `server.properties` (which is set via environment variables). | `docker exec mc sendcmd changesetting difficulty peaceful` |
 
-## Whitelist Management
+## Allowlist Management
 
-Adding/removing gamertags to/from server's whitelist can be done by either:
+Adding/removing gamertags to/from server's allowlist can be done by either:
 
-- Editing the `whitelist.json` file and issuing the server commend `whitelist reload` (eg: `docker exec <container> sendcmd whitelist reload`); or
-- Using server commands, eg:
-  - Adding: `docker exec <container> sendcmd whitelist add <Gamertag>`.
-  - Removing: `docker exec <container> sendcmd whitelist remove <Gamertag>`.
-  - Note: If there is a white-space in the Gamertag you need to enclose it with double quates: `docker exec <container> sendcmd whitelist add "Example Name"`.
+- Editing the `allowlist.json` file and issuing the server command `allowlist reload` (e.g. `docker exec <container> sendcmd allowlist reload`); or
+- Using server commands, e.g.:
+  - Adding: `docker exec <container> sendcmd allowlist add <Gamertag>`.
+  - Removing: `docker exec <container> sendcmd allowlist remove <Gamertag>`.
+  - Note: If there is whitespace in the Gamertag you need to enclose it with double quotes: `docker exec <container> sendcmd allowlist add "Example Name"`.
 
 ## Permissions Management
 
 Adding/removing server permissions can be done by either:
 
-- Editing the `permissions.json` file and issuing the server commend `permission reload` (eg: `docker exec <container> sendcmd permission reload`); or
-- Using server commands, eg:
+- Editing the `permissions.json` file and issuing the server command `permission reload` (e.g. `docker exec <container> sendcmd permission reload`); or
+- Using server commands, e.g.:
   - Opping: `docker exec <container> sendcmd op <player>`.
   - Deopping: `docker exec <container> sendcmd deop <player>`.
-  - Note: If there is a white-space in the player name you need to enclose it with double quates: `docker exec <container> sendcmd op "Example Name"`.
+  - Note: If there is whitespace in the player name you need to enclose it with double quotes: `docker exec <container> sendcmd op "Example Name"`.
 
 ## Getting help
 
