@@ -33,6 +33,7 @@ RUN set -x && \
       file \
       gawk \
       gnupg2 \
+      iproute2 \
       libcurl4 \
       procps \
       tmux \
