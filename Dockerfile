@@ -3,13 +3,11 @@ FROM golang:1.26-trixie AS mc-monitor-builder
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 # Get & build mc-monitor
-RUN git clone https://github.com/itzg/mc-monitor.git /src/mc-monitor
-RUN pushd /src/mc-monitor && \
-    go mod tidy
-RUN pushd /src/mc-monitor && \
-    go build
-RUN cp -v /src/mc-monitor/mc-monitor /usr/local/bin
-RUN /usr/local/bin/mc-monitor -h
+RUN git clone https://github.com/itzg/mc-monitor.git /src/mc-monitor && \
+    go -C /src/mc-monitor mod tidy && \
+    go -C /src/mc-monitor build && \
+    cp -v /src/mc-monitor/mc-monitor /usr/local/bin && \
+    /usr/local/bin/mc-monitor -h
 
 FROM debian:trixie
 
@@ -44,7 +42,7 @@ RUN set -x && \
     MINECRAFT_LINUX_SERVER_URL="https://www.minecraft.net/bedrockdedicatedserver/bin-linux/bedrock-server-1.26.32.2.zip" && \
     # Download bedrock server
     mkdir -p /src && \
-    wget -O /src/bedrock-server.zip "$MINECRAFT_LINUX_SERVER_URL" && \
+    wget --progress=dot:giga -O /src/bedrock-server.zip "$MINECRAFT_LINUX_SERVER_URL" && \
     # Unpack minecraft server
     mkdir -p /opt/minecraft && \
     unzip /src/bedrock-server.zip -d /opt/minecraft && \

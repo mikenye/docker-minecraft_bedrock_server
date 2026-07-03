@@ -10,6 +10,8 @@ This container provides a Minecraft Bedrock server!
 - Supported `server.properties` options can be configured via environment variables.
 - `bedrock_server` binary runs as an unprivileged user.
 
+Images are published to `ghcr.io/mikenye/docker-minecraft_bedrock_server`.
+
 ## Quick Start - Example with `docker run`
 
 ### Create docker volumes
@@ -42,7 +44,7 @@ docker run \
     -v minecraft_permissions:/opt/minecraft/permissions \
     -p 19132:19132/udp \
     -p 19133:19133/udp \
-    mikenye/minecraft_bedrock_server
+    ghcr.io/mikenye/docker-minecraft_bedrock_server
 ```
 
 ### Allowlist yourself
@@ -82,7 +84,7 @@ volumes:
 
 services:
   minecraft:
-    image: mikenye/minecraft_bedrock_server
+    image: ghcr.io/mikenye/docker-minecraft_bedrock_server
     container_name: mc
     tty: true
     restart: always
