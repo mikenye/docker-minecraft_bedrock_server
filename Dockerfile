@@ -13,6 +13,8 @@ RUN /usr/local/bin/mc-monitor -h
 
 FROM debian:trixie
 
+ARG S6_OVERLAY_VERSION=3.2.3.0
+
 ENV PUID=1000 \
     PGID=1000 \
     S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
@@ -57,9 +59,6 @@ RUN set -x && \
     touch /opt/minecraft/permissions.json && \
     mv -v /opt/minecraft/permissions.json /opt/minecraft/permissions/permissions.json && \
     ln -s /opt/minecraft/permissions/permissions.json /opt/minecraft/permissions.json && \
-    # Deploy s6 overlay
-    curl -o /tmp/deploy-s6-overlay.sh -s https://raw.githubusercontent.com/mikenye/deploy-s6-overlay/master/deploy-s6-overlay.sh && \
-    bash /tmp/deploy-s6-overlay.sh && \
     # Clean up
     apt-get remove -y \
       ca-certificates \
@@ -85,6 +84,11 @@ RUN set -x && \
     cat /MINECRAFT_VERSION && \
     # If /MINECRAFT_VERSION is empty, then raise an error (should have version inside)
     if [ ! -s /MINECRAFT_VERSION ]; then exit 1; fi
+
+ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-noarch.tar.xz /tmp
+RUN tar -C / -Jxpf /tmp/s6-overlay-noarch.tar.xz
+ADD https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-x86_64.tar.xz /tmp
+RUN tar -C / -Jxpf /tmp/s6-overlay-x86_64.tar.xz
 
 COPY /rootfs /
 
