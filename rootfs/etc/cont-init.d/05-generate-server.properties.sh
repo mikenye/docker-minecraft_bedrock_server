@@ -39,9 +39,13 @@ if [ -n "${MINECRAFT_ONLINE_MODE}" ]; then
   sed -i "/${search}/c\\${replace}" "${SERVER_PROPERTIES_FILE}"
 fi
 
-if [ -n "${MINECRAFT_WHITE_LIST}" ]; then
-  search="white-list="
-  replace="white-list=${MINECRAFT_WHITE_LIST}"
+if [ -n "${MINECRAFT_ALLOW_LIST}" ]; then
+  search="allow-list="
+  replace="allow-list=${MINECRAFT_ALLOW_LIST}"
+  sed -i "/${search}/c\\${replace}" "${SERVER_PROPERTIES_FILE}"
+elif [ -n "${MINECRAFT_WHITE_LIST}" ]; then
+  search="allow-list="
+  replace="allow-list=${MINECRAFT_WHITE_LIST}"
   sed -i "/${search}/c\\${replace}" "${SERVER_PROPERTIES_FILE}"
 fi
 
