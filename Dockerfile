@@ -1,15 +1,16 @@
-FROM golang:1.19.0-bullseye AS mc-monitor-builder
+FROM golang:1.26-trixie AS mc-monitor-builder
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 # Get & build mc-monitor
-RUN git clone https://github.com/itzg/mc-monitor.git /src/mc-monitor && \
-    pushd /src/mc-monitor && \
-    go get && \
-    go build && \
-    cp -v mc-monitor /usr/local/bin
+RUN git clone https://github.com/itzg/mc-monitor.git /src/mc-monitor
+RUN pushd /src/mc-monitor
+RUN go mod tidy
+RUN go build
+RUN cp -v mc-monitor /usr/local/bin
+RUN /usr/local/bin/mc-monitor -h
 
-FROM debian:bullseye
+FROM debian:trixie
 
 ENV PUID=1000 \
     PGID=1000 \
@@ -28,32 +29,28 @@ RUN set -x && \
       curl \
       file \
       gawk \
-      # gcc \
-      # git \
       gnupg2 \
-      # libc-dev \
       libcurl4 \
       procps \
       tmux \
       unzip \
       xz-utils \
+      wget \
       && \
-    # Get latest server binary
-    #MINECRAFT_LINUX_SERVER_URL=$(curl "https://www.minecraft.net/en-us/download/server/bedrock" | grep "serverBedrockLinux" | grep -oE "href=\"https://.*/.*\.zip" | cut -d '"' -f 2) && \
-    MINECRAFT_LINUX_SERVER_URL="https://minecraft.azureedge.net/bin-linux/bedrock-server-1.20.15.01.zip" && \
+    MINECRAFT_LINUX_SERVER_URL="https://www.minecraft.net/bedrockdedicatedserver/bin-linux/bedrock-server-1.26.32.2.zip" && \
     # Download bedrock server
     mkdir -p /src && \
-    curl --location --output /src/bedrock-server.zip "$MINECRAFT_LINUX_SERVER_URL" && \
+    wget -O /src/bedrock-server.zip "$MINECRAFT_LINUX_SERVER_URL" && \
     # Unpack minecraft server
     mkdir -p /opt/minecraft && \
     unzip /src/bedrock-server.zip -d /opt/minecraft && \
     mkdir -p /opt/minecraft/worlds_backup && \
     touch /opt/minecraft/worlds_backup/.placeholder && \
-    # Move & link whitelist
-    mkdir -p /opt/minecraft/whitelist && \
-    touch /opt/minecraft/whitelist.json && \
-    mv -v /opt/minecraft/whitelist.json /opt/minecraft/whitelist/whitelist.json && \
-    ln -s /opt/minecraft/whitelist/whitelist.json /opt/minecraft/whitelist.json && \
+    # Move & link allowlist
+    mkdir -p /opt/minecraft/allowlist && \
+    touch /opt/minecraft/allowlist.json && \
+    mv -v /opt/minecraft/allowlist.json /opt/minecraft/allowlist/allowlist.json && \
+    ln -s /opt/minecraft/allowlist/allowlist.json /opt/minecraft/allowlist.json && \
     # Move & link permissions
     mkdir -p /opt/minecraft/permissions && \
     touch /opt/minecraft/permissions.json && \
@@ -73,6 +70,7 @@ RUN set -x && \
       golang-go \
       libc-dev \
       unzip \
+      wget \
       && \
     apt-get autoremove -y && \
     apt-get clean -y && \
@@ -81,7 +79,7 @@ RUN set -x && \
     # Document minecraft version
     pushd /opt/minecraft && \
     chmod a+x ./bedrock_server && \
-    LD_LIBRARY_PATH=. timeout 5s ./bedrock_server | grep -i version | cut -d " " -f 5 > /MINECRAFT_VERSION || true && \
+    LD_LIBRARY_PATH=. timeout 5s ./bedrock_server | awk -F'Version: ' '/Version:/ { print $2; exit }' > /MINECRAFT_VERSION || true && \
     popd && \
     cat /MINECRAFT_VERSION && \
     # If /MINECRAFT_VERSION is empty, then raise an error (should have version inside)

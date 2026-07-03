@@ -64,9 +64,9 @@ for i in "${BKUP[@]}"; do
         truncate -s "$WORLD_FILE_OFFSET" "${BACKUP_DESTINATION}/${file}"
     done
 
-    # Also copy settings, whitelist and permissions for this point in time
+    # Also copy settings, allowlist and permissions for this point in time
     cp "/opt/minecraft/server.properties" "${BACKUP_DESTINATION}/server.properties"
-    cp "/opt/minecraft/whitelist.json" "${BACKUP_DESTINATION}/whitelist.json"
+    cp "/opt/minecraft/allowlist.json" "${BACKUP_DESTINATION}/allowlist.json"
     cp "/opt/minecraft/permissions.json" "${BACKUP_DESTINATION}/permissions.json"
 
 done
