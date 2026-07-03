@@ -53,7 +53,7 @@ jobs:
           } >> "$GITHUB_ENV"
 
       - name: Build and push
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: ./Dockerfile
@@ -66,7 +66,7 @@ jobs:
         run: sed '/^HEALTHCHECK /d' < Dockerfile > Dockerfile.nohealthcheck
 
       - name: Build and push nohealthcheck
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: ./Dockerfile.nohealthcheck
