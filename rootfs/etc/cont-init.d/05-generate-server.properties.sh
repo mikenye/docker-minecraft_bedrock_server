@@ -1,4 +1,4 @@
-#!/usr/bin/with-contenv bash
+#!/command/with-contenv bash
 # shellcheck shell=bash
 
 SERVER_PROPERTIES_FILE="/opt/minecraft/server.properties"
