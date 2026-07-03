@@ -1,0 +1,33 @@
+version: 2
+updates:
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Australia/Perth"
+    open-pull-requests-limit: 5
+    groups:
+      docker-non-major:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Australia/Perth"
+    open-pull-requests-limit: 5
+    groups:
+      github-actions-non-major:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
