@@ -1,4 +1,4 @@
-FROM golang:1.26-trixie AS mc-monitor-builder
+FROM golang:1.27-trixie AS mc-monitor-builder
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
